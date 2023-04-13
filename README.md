@@ -19,7 +19,7 @@ classification can be best compared to classification of climate
 classification](https://en.wikipedia.org/wiki/K%C3%B6ppen_climate_classification))
 and [biomes](https://en.wikipedia.org/wiki/Biome).
 
-Knowing the soil type of your land can be fairly useful as soil types
+Knowing the soil type of your land can be fairly useful as a soil type
 conveys complex multivariate information and are ideal summaries of
 soil. Soil types are used as input to crop-yield modeling, land use
 management planning and landscape modeling of natural hazards and
@@ -31,10 +31,10 @@ Taxonomy](https://www.nrcs.usda.gov/resources/guides-and-instructions/keys-to-so
 (KST). What somewhat adds to complexity of using soil classification is
 that many countries have their own classification systems (in a local
 language), but often national soil types can be **correlated to some
-international system** e.g. WRB or KST (Krasilnikov, Arnold, Marti, &
-Shoba, 2009). Correlation is not ideal and hence it is good to consider
-that one soil type in a local system could be translated to at least 2
-or 3 soil types in the international (target) system.
+international system** e.g. WRB or KST Verweij (2017). Correlation is
+not ideal and hence it is good to consider that one soil type in a local
+system could be translated to at least 2 or 3 soil types in the
+international (target) system.
 
 In this computational notebook we show how to globally map soil types,
 how to access the [predictions we
@@ -65,17 +65,19 @@ soil polygon map e.g. [Harmonized World Soil
 Database](https://iiasa.ac.at/models-tools-data/hwsd) (HWSD) (FAO &
 IIASA, 2023). The HWSDv2 contains also the WRB 2022 version soil types
 per mapping unit, but these are potentially of variable accuracy and
-should be only use to fill-in gaps in training data.
+should be only used to fill gaps in training data.
 
 In addition to WoSIS and HWSDv2, we can also add some additional points
 coming from the land-surface observations e.g. to represent shifting
 sand and bare-rock areas. Global land cover validation data sets that
 are produced by photo-interpretation of very high resolution satellite
-imagery (e.g. 20 cm resolution) often contain also observations of the
+imagery (e.g. 20 cm resolution) often contain useful observations of the
 shifting sand, permanent ice and bare-rocks (Tsendbazar et al., 2021).
+These specific surface materials are often missing in the legacy soil
+profile datasets.
 
-To produce the soil type predictions at 1\~km spatial resolution, we
-have hence decided to use a combination of the legacy soil profiles,
+To produce the soil type predictions at 1 km spatial resolution, we have
+hence decided to use a combination of the legacy soil profiles,
 surface-cover observations and simulated points from the HWSDv2. This
 gave us about 70,000 training points in total (see figure below).
 Although there are still some potential issues with some countries being
@@ -252,7 +254,7 @@ out[,which(rank(t(out), ties.method = "random") %in% c(ncol(out)-c(2,1,0)))]
     ##                  <int>               <int>               <int>
     ## 1                   33                  37                   4
 
-The shows that the two most probable soil type at this location are
+This shows that the two most probable soil types at this location are
 `Haplic.Chernozems` or `Luvic.Chernozems`. You can read more about these
 soils by using the [WRB
 documents](https://www.fao.org/soils-portal/data-hub/soil-classification/world-reference-base/en/).
@@ -393,6 +395,15 @@ Tsendbazar, N., Herold, M., Li, L., Tarko, A., De Bruin, S., Masiliunas,
 D., et al.others. (2021). Towards operational validation of annual
 global land cover maps. *Remote Sensing of Environment*, *266*, 112686.
 doi:[10.1016/j.rse.2021.112686](https://doi.org/10.1016/j.rse.2021.112686)
+
+</div>
+
+<div id="ref-Verweij2017" class="csl-entry">
+
+Verweij, S. (2017). *Exploring the use of multiple covariates and
+machine learning in disaggregating complex soil maps*. Wageningen:
+Wageningen University, Soil Geography; Landscape. Retrieved from
+<https://edepot.wur.nl/425324>
 
 </div>
 
