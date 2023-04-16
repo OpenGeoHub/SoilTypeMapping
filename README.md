@@ -1,7 +1,7 @@
 Predictive mapping of soil types using legacy soil observations
 ================
 Tomislav Hengl (OpenGeoHub), Robert Minarik (OpenGeoHub)
-2023-04-14
+2023-04-16
 
 [![DOI](https://zenodo.org/badge/doi/10.5281/zenodo.7820796.svg)](https://doi.org/10.5281/zenodo.7820796)
 
@@ -36,9 +36,9 @@ international system** e.g. WRB or KST (Krasilnikov, Arnold, Marti, &
 Shoba, 2009; Verweij, 2017), so that even though different countries use
 somewhat different concepts, many soil classification systems are really
 comparable (Michéli, Láng, Owens, McBratney, & Hempel, 2016).
-Correlation is not ideal and hence it is good to consider that one soil
-type in a local system could be translated to at least 2 or 3 soil types
-in the international (target) system.
+Correlation is, nevertheless, not always ideal and it is good to
+consider that one soil type in a local system could be translated to at
+least 2 or 3 soil types in the international (target) system.
 
 In this computational notebook we show how to generate a global map of
 soil types, how to access the [predictions we
@@ -61,33 +61,14 @@ with soil classification (Batjes, Ribeiro, & Van Oostrum, 2020) and can
 be considered one of the most consistent global soil profile
 compilations.
 
-A disadvantage of using only legacy soil profiles, however, is that
-these are often spatially clustered i.e. large gaps exists where almost
-no data available. This applies especially for African and Asian
-continents. To increase spatial coverage of the training points for
-global soil type mapping, we can add points generated from the global
-soil polygon map e.g. [Harmonized World Soil
-Database](https://iiasa.ac.at/models-tools-data/hwsd) (HWSD) (FAO &
-IIASA, 2023). The HWSDv2 contains also the WRB 2022 version soil types
-per mapping unit, but these are potentially of variable accuracy and
-should be only used to fill gaps in training data.
-
-In addition to WoSIS and HWSDv2, we can also add some additional points
-coming from the land-surface observations e.g. to represent shifting
-sand and bare-rock areas. Global land cover validation data sets that
-are produced by photo-interpretation of very high resolution satellite
-imagery (e.g. 20 cm resolution) often contain useful observations of the
-shifting sand, permanent ice and bare-rocks (Tsendbazar et al., 2021).
-These specific surface materials are often missing in the legacy soil
-profile datasets.
-
 To produce the soil type predictions at 1 km spatial resolution, we have
 hence decided to use a combination of the legacy soil profiles,
 surface-cover observations and simulated points from the HWSDv2. This
-gave us about 70,000 training points in total (see figure below).
-Although there are still some potential issues with some countries being
-over-represented, the final training data set can be considered
-spatially complete and representative.
+gave us about [70,000 training
+points](https://opengeohub.github.io/SoilSamples/wrb-soil-types.html) in
+total (see figure below). Although there are still some potential issues
+with some countries being over-represented, the final training data set
+can be considered spatially complete and representative.
 
 <div class="figure">
 
@@ -119,7 +100,7 @@ As covariate layers for soil type mapping, we use the common global,
 
 After we have imported and harmonized all training points, we run
 spatial overlay using the terra package (Hijmans, 2019), which can also
-be run in parallel:
+be run in parallel by using e.g.:
 
 ``` r
 ov.stat = parallel::mclapply(tif.lst, function(i){
@@ -307,8 +288,9 @@ issues you discover.
 
 The following key improvements are planned in the next release:
 
-- Training points will be quality controlled and potential artifacts
-  removed,
+- [Training
+  points](https://opengeohub.github.io/SoilSamples/wrb-soil-types.html)
+  will be quality controlled and potential artifacts removed,
 - Prediction errors will be provided per pixel for each class
   probability,
 - Finer-resolution covariate layers (up to 100 m spatial resolution) can
@@ -344,14 +326,6 @@ doi:[10.5194/essd-12-299-2020](https://doi.org/10.5194/essd-12-299-2020)
 
 </div>
 
-<div id="ref-hwsd2023" class="csl-entry">
-
-FAO & IIASA. (2023). *<span class="nocase">Harmonized World Soil
-Database version 2.0</span>*. Rome; Laxenburg: FAO.
-doi:[10.4060/cc3823en](https://doi.org/10.4060/cc3823en)
-
-</div>
-
 <div id="ref-hengl2017soilgrids250m" class="csl-entry">
 
 Hengl, T., Mendes de Jesus, J., Heuvelink, G. B., Ruiperez Gonzalez, M.,
@@ -364,9 +338,10 @@ doi:[10.1371/journal.pone.0169748](https://doi.org/10.1371/journal.pone.0169748)
 
 <div id="ref-hijmans2019spatial" class="csl-entry">
 
-Hijmans, R. J. (2019). <span class="nocase">Spatial data in R</span>.
-*United States: GFC for the Innovation Lab for Collaborative Research on
-Sustainable Intensification*. Retrieved from <https://rspatial.org/>
+Hijmans, R. J. (2019). *<span class="nocase">Spatial data in R</span>*.
+Davis, CA: United States: GFC for the Innovation Lab for Collaborative
+Research on Sustainable Intensification. Retrieved from
+<https://rspatial.org/>
 
 </div>
 
@@ -411,15 +386,6 @@ Ribeiro, E., & Rossiter, D. (2021). <span class="nocase">SoilGrids 2.0:
 producing soil information for the globe with quantified spatial
 uncertainty</span>. *Soil*, *7*(1), 217–240.
 doi:[10.5194/soil-7-217-2021](https://doi.org/10.5194/soil-7-217-2021)
-
-</div>
-
-<div id="ref-tsendbazar2021towards" class="csl-entry">
-
-Tsendbazar, N., Herold, M., Li, L., Tarko, A., De Bruin, S., Masiliunas,
-D., et al.others. (2021). Towards operational validation of annual
-global land cover maps. *Remote Sensing of Environment*, *266*, 112686.
-doi:[10.1016/j.rse.2021.112686](https://doi.org/10.1016/j.rse.2021.112686)
 
 </div>
 
