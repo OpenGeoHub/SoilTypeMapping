@@ -1,7 +1,7 @@
 Predictive mapping of soil types using legacy soil observations
 ================
 Tomislav Hengl (OpenGeoHub), Robert Minarik (OpenGeoHub)
-2023-04-16
+Last update: 2023-05-22
 
 [![DOI](https://zenodo.org/badge/doi/10.5281/zenodo.7820796.svg)](https://doi.org/10.5281/zenodo.7820796)
 
@@ -24,8 +24,8 @@ Knowing the soil type of your land can be fairly useful as a soil type
 conveys complex multivariate information and are ideal summaries of
 soil. Soil types are used as input to crop-yield modeling, land use
 management planning and landscape modeling of natural hazards and
-similar. Soils can be classified using the classification manuals e.g. 
-FAO’s IUSS’s [World Reference Base (WRB)
+similar. Soils can be classified using the classification manuals
+e.g. FAO’s IUSS’s [World Reference Base (WRB)
 manual](https://www.fao.org/soils-portal/data-hub/soil-classification/world-reference-base/en/)
 and/or [USDA Keys to Soil
 Taxonomy](https://www.nrcs.usda.gov/resources/guides-and-instructions/keys-to-soil-taxonomy)
@@ -70,14 +70,7 @@ total (see figure below). Although there are still some potential issues
 with some countries being over-represented, the final training data set
 can be considered spatially complete and representative.
 
-<div class="figure">
-
 <img src="img/preview_luvic.chernozems.png" alt="Training points used for global soil type mapping." width="100%" />
-<p class="caption">
-Training points used for global soil type mapping.
-</p>
-
-</div>
 
 As covariate layers for soil type mapping, we use the common global,
 (primarily remote sensing based) global layers including:
@@ -121,16 +114,22 @@ wrb.rm = readRDS("./data/WRB_global_cm_v20230412.rds")
 head(wrb.rm[,1:10])
 ```
 
-    ## # A tibble: 6 x 10
+    ## # A tibble: 6 × 10
     ## # Groups:   h_wrb4 [4]
-    ##   profile… latitu… longit… h_wrb4 source… row.id monthl… monthl… monthl… monthl…
-    ##   <chr>      <dbl>   <dbl> <chr>  <chr>    <int>   <dbl>   <dbl>   <dbl>   <dbl>
-    ## 1 47431       6.59    2.15 Eutri… {AF-Af…      1   4742.    269.   5476.    89.2
-    ## 2 47478       6.59    2.19 Eutri… {AF-Af…      2   4892     254.   5132.   122. 
-    ## 3 47503       6.59    2.23 Eutri… {AF-Af…      3   4477.    264.   4917.    16.9
-    ## 4 47596       6.87    2.35 Hapli… {AF-Af…      4   5704.    444.   5332.    64.9
-    ## 5 52678       1.07   34.9  Hapli… {AF-Af…      5   3474.    801.   4719.   377. 
-    ## 6 52686       0.94   35.0  Geric… {AF-Af…      6   2952.    881.   4728.   475.
+    ##   profile_id latitude longitude h_wrb4   source_db row.id monthly.evi_mod13q1.…¹
+    ##   <chr>         <dbl>     <dbl> <chr>    <chr>      <int>                  <dbl>
+    ## 1 47431          6.59      2.15 Eutric … {AF-AfSP…      1                  4742.
+    ## 2 47478          6.59      2.19 Eutric … {AF-AfSP…      2                  4892 
+    ## 3 47503          6.59      2.23 Eutric … {AF-AfSP…      3                  4477.
+    ## 4 47596          6.87      2.35 Haplic … {AF-AfSP…      4                  5704.
+    ## 5 52678          1.07     34.9  Haplic … {AF-AfSP…      5                  3474.
+    ## 6 52686          0.94     35.0  Geric F… {AF-AfSP…      6                  2952.
+    ## # ℹ abbreviated name:
+    ## #   ¹​monthly.evi_mod13q1.v061.apr_p50_1km_s_2000_2021_go_epsg.4326_v20230221
+    ## # ℹ 3 more variables:
+    ## #   monthly.evi_mod13q1.v061.apr_sd_1km_s_2000_2021_go_epsg.4326_v20230221 <dbl>,
+    ## #   monthly.evi_mod13q1.v061.aug_p50_1km_s_2000_2021_go_epsg.4326_v20230221 <dbl>,
+    ## #   monthly.evi_mod13q1.v061.aug_sd_1km_s_2000_2021_go_epsg.4326_v20230221 <dbl>
 
 This contains the target variable `h_wrb4`, coordinates of the points +
 values of some 130 covariate layers listed above. The most frequent WRB
@@ -152,7 +151,10 @@ randomForestSRC package (Ishwaran & Kogalur, 2022):
 
 ``` r
 vs.wrb = readRDS("./data/topvars_wrb4.rds")
-dfs = wrb.rm[,c("h_wrb4", make.names(vs.wrb$topvars))]
+## Random subset otherwise very computational:
+sub = sample.int(nrow(wrb.rm), size=2e3)
+dfs = as.data.frame(wrb.rm[sub, c("h_wrb4", make.names(vs.wrb$topvars))])
+dfs$h_wrb4 = as.factor(dfs$h_wrb4)
 m.test = randomForestSRC::rfsrc(h_wrb4 ~ ., data=dfs, mtry=88, importance=TRUE, ntree=85)
 ```
 
@@ -189,14 +191,7 @@ ggplot(data = feat_imp_df[1:20,], aes(x = reorder(variable, relative_importance)
    theme_bw() + theme(text = element_text(size=15))
 ```
 
-<div class="figure">
-
 <img src="img/global_wrb_variable_importance.png" alt="Variable importance plot for mapping soil types." width="80%" />
-<p class="caption">
-Variable importance plot for mapping soil types.
-</p>
-
-</div>
 
 For predicting the class probabilities the most important metric is most
 likely the
@@ -235,7 +230,7 @@ out = extract_xy(x=19.2045, y=46.2251)
 out[,which(rank(t(out), ties.method = "random") %in% c(ncol(out)-c(2,1,0)))]
 ```
 
-    ## # A tibble: 1 x 3
+    ## # A tibble: 1 × 3
     ##   Haplic.Chernozems_p_ Luvic.Chernozems_p_ Petric.Calcisols_p_
     ##                  <int>               <int>               <int>
     ## 1                   33                  37                   4
@@ -302,15 +297,15 @@ The following key improvements are planned in the next release:
 
 ## Acknowledgments
 
-**[EarthMonitor.org](https://EarthMonitor.org/)** project has received
+[**EarthMonitor.org**](https://EarthMonitor.org/) project has received
 funding from the European Union’s Horizon Europe research an innovation
 programme under grant agreement
-**[No. 101059548](https://cordis.europa.eu/project/id/101059548)**.
+[**No. 101059548**](https://cordis.europa.eu/project/id/101059548).
 
-**[AI4SoilHealth.eu](https://AI4SoilHealth.eu/)** project has received
+[**AI4SoilHealth.eu**](https://AI4SoilHealth.eu/) project has received
 funding from the European Union’s Horizon Europe research an innovation
 programme under grant agreement
-**[No. 101086179](https://cordis.europa.eu/project/id/101086179)**.
+[**No. 101086179**](https://cordis.europa.eu/project/id/101086179).
 
 ## References
 
